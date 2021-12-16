@@ -12,11 +12,6 @@
 #include "inc/v8stdint.h"
 
 #define __small_endian
-typedef int32_t result_t;
-#define RESULT_OK 0
-#define RESULT_TIMEOUT -1
-#define RESULT_FAIL -2
-
 
 #define LIDAR_CMD_STOP                      0x65
 #define LIDAR_CMD_SCAN                      0x60
@@ -64,6 +59,11 @@ typedef int32_t result_t;
 #define PackagePaidBytes 10
 #define PH 0x55AA
 
+typedef enum {
+  RESULT_OK =  0,
+  RESULT_TIMEOUT = -1,
+  RESULT_FAIL = -2
+} result_t;
 
 typedef enum {
   CT_Normal = 0,
