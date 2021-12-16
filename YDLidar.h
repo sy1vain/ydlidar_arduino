@@ -11,6 +11,12 @@
 #include "Arduino.h"
 #include "inc/v8stdint.h"
 
+#define __small_endian
+typedef int32_t result_t;
+#define RESULT_OK 0
+#define RESULT_TIMEOUT -1
+#define RESULT_FAIL -2
+
 
 #define LIDAR_CMD_STOP                      0x65
 #define LIDAR_CMD_SCAN                      0x60
@@ -65,11 +71,13 @@ typedef enum {
   CT_Tail,
 } CT;
 
+#pragma pack(push, 1)
+
 struct node_info {
-  uint8_t    sync_quality;
-  uint16_t   angle_q6_checkbit;
-  uint16_t   distance_q2;
-} __attribute__((packed)) ;
+  uint8_t sync_quality;
+  uint16_t angle_q6_checkbit;
+  uint16_t distance_q2;
+};
 
 struct node_package {
   uint16_t  package_Head;
@@ -79,7 +87,7 @@ struct node_package {
   uint16_t  packageLastSampleAngle;
   uint16_t  checkSum;
   uint16_t  packageSampleDistance[PackageSampleMaxLngth];
-} __attribute__((packed)) ;
+};
 
 
 struct device_info {
@@ -87,31 +95,31 @@ struct device_info {
   uint16_t  firmware_version;
   uint8_t   hardware_version;
   uint8_t   serialnum[16];
-} __attribute__((packed)) ;
+};
 
 struct device_health {
   uint8_t   status;
   uint16_t  error_code;
-} __attribute__((packed))  ;
+};
 
 struct sampling_rate {
   uint8_t rate;
-} __attribute__((packed))  ;
+};
 
 struct scan_frequency {
   uint32_t frequency;
-} __attribute__((packed))  ;
+};
 
 struct scan_rotation {
   uint8_t rotation;
-} __attribute__((packed))  ;
+};
 
 struct cmd_packet {
   uint8_t syncByte;
   uint8_t cmd_flag;
   uint8_t size;
   uint8_t data;
-} __attribute__((packed)) ;
+};
 
 struct lidar_ans_header {
   uint8_t  syncByte1;
@@ -119,7 +127,9 @@ struct lidar_ans_header {
   uint32_t size: 30;
   uint32_t subType: 2;
   uint8_t  type;
-} __attribute__((packed));
+};
+
+#pragma pack(pop)
 
 struct scanPoint {
   uint8_t quality;
