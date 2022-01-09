@@ -71,6 +71,15 @@ typedef enum {
   CT_Tail,
 } CT;
 
+typedef enum {
+  FREQ_NONE = LIDAR_CMD_GET_AIMSPEED,
+  FREQ_INC = LIDAR_CMD_SET_AIMSPEED_ADD,
+  FREQ_DEC = LIDAR_CMD_SET_AIMSPEED_DIS,
+  FREQ_INC_TENTH = LIDAR_CMD_SET_AIMSPEED_ADDMIC,
+  FREQ_DEC_TENTH = LIDAR_CMD_SET_AIMSPEED_DISMIC,
+
+} FREQ_CHANGE;
+
 #pragma pack(push, 1)
 
 struct node_info {
@@ -170,6 +179,12 @@ class YDLidar {
 
   // ask the YDLIDAR for its device info like the serial number
   result_t getDeviceInfo(device_info &info, uint32_t timeout = DEFAULT_TIMEOUT);
+
+  // inquire current frequency
+  result_t getScanFrequency(scan_frequency &frequency, uint32_t timeout = DEFAULT_TIMEOUT);
+
+  // change scan frequency
+  result_t changeScanFrequency(FREQ_CHANGE change, scan_frequency &frequency, uint32_t timeout = DEFAULT_TIMEOUT);
 
   // stop the scanPoint operation
   result_t stop(void);
