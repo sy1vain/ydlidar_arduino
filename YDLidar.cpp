@@ -152,6 +152,62 @@ result_t YDLidar::getDeviceInfo(device_info &info, uint32_t timeout) {
   return RESULT_TIMEOUT;
 }
 
+// inquire current frequency
+result_t YDLidar::getScanFrequency(scan_frequency &frequency, uint32_t timeout) {
+  return changeScanFrequency(FREQ_NONE, frequency, timeout);
+}
+
+// change scan frequency
+result_t YDLidar::changeScanFrequency(FREQ_CHANGE change, scan_frequency& frequency, uint32_t timeout) {
+  result_t ans;
+  uint8_t recvPos = 0;
+  uint32_t currentTs = millis();
+  uint32_t remainingtime;
+  uint8_t *infobuf = (uint8_t *)&frequency;
+  lidar_ans_header response_header;
+
+  if (!isOpen()) {
+    return RESULT_FAIL;
+  }
+
+  {
+
+    ans = sendCommand(change, NULL, 0);
+
+    if (ans != RESULT_OK) {
+      return ans;
+    }
+
+    if ((ans = waitResponseHeader(&response_header, timeout)) != RESULT_OK) {
+      return ans;
+    }
+
+    if (response_header.type != LIDAR_ANS_TYPE_DEVINFO) {
+      return RESULT_FAIL;
+    }
+
+    if (response_header.size < sizeof(scan_frequency)) {
+      return RESULT_FAIL;
+    }
+
+    while ((remainingtime = millis() - currentTs) <= timeout) {
+      int currentbyte = _bined_serialdev->read();
+
+      if (currentbyte < 0) {
+        continue;
+      }
+
+      infobuf[recvPos++] = currentbyte;
+
+      if (recvPos == sizeof(scan_frequency)) {
+        return RESULT_OK;
+      }
+    }
+  }
+
+  return RESULT_TIMEOUT;
+}
+
 // stop the scanPoint operation
 result_t YDLidar::stop(void) {
   if (!isOpen()) {
